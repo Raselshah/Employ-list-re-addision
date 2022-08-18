@@ -21,6 +21,7 @@ const UserTable = () => {
   const navigate = useNavigate();
 
   const [userInfo, setUserInfo] = useState([]);
+  const [user, setUser] = useState([]);
   const [value, setValue] = useState("");
   useEffect(() => {
     axios
@@ -30,9 +31,35 @@ const UserTable = () => {
       .then((res) => setUserInfo(res.data));
   }, []);
 
-  const newUser = userInfo.filter((user) =>
-    user.first_name.toLowerCase().includes(value.toLowerCase())
-  );
+  useEffect(() => {
+    const newUser = userInfo.filter((user) =>
+      user.first_name.toLowerCase().includes(value.toLowerCase())
+    );
+    setUser(newUser);
+  }, [value]);
+
+  const [salary, setSalary] = useState(0);
+  const [salary1, setSalary1] = useState(10000000);
+  const handleSalary = (e) => {
+    e.preventDefault();
+    setSalary(e.target.salary.value);
+    setSalary1(e.target.salary2.value);
+  };
+  useEffect(() => {
+    const data = userInfo.filter(
+      (user) =>
+        parseInt(user?.salary.replace(/,/g, "")) > parseInt(salary) &&
+        parseInt(user?.salary.replace(/,/g, "")) < parseInt(salary1)
+    );
+    setUser(data);
+  }, [salary, salary1]);
+
+  //
+
+  // const i = [1, 2, 3, 4, 5, 6, 7];
+  // console.log(i.filter((j) => j > 3 && j < 5));
+
+  console.log(user);
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -76,17 +103,6 @@ const UserTable = () => {
   const handleUserDetails = (name) => {
     navigate(`/userDetails/${name}`);
   };
-
-  const [salary, setSalary] = useState(0);
-  const [salary1, setSalary1] = useState(0);
-  const handleSalary = (e) => {
-    e.preventDefault();
-    setSalary(e.target.salary.value);
-    setSalary1(e.target.salary2.value);
-  };
-  const data = userInfo.filter(
-    (user) => salary > user?.salary && user?.salary < salary1
-  );
 
   return (
     <Box sx={{ maxWidth: "1540px", padding: "15px" }}>
@@ -138,7 +154,7 @@ const UserTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data
+            {user
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => (
                 <StyledTableRow key={row.id}>
@@ -178,7 +194,7 @@ const UserTable = () => {
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={newUser.length}
+        count={user.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
