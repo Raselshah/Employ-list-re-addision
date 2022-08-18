@@ -77,6 +77,20 @@ const UserTable = () => {
     navigate(`/userDetails/${name}`);
   };
 
+  const [salary, setSalary] = useState();
+  const [salary1, setSalary1] = useState();
+  const handleSalary = (e) => {
+    e.preventDefault();
+    setSalary(e.target.salary.value);
+    setSalary1(e.target.salary2.value);
+  };
+  console.log(salary, salary1);
+
+  const data = userInfo.filter(
+    (user) => salary > user?.salary && user?.salary < salary1
+  );
+  console.log(data);
+
   return (
     <Box sx={{ maxWidth: "1540px", padding: "15px" }}>
       <Box
@@ -106,6 +120,11 @@ const UserTable = () => {
           <SearchIcon position="start" /> Search
         </Button>
       </Box>
+      <form onSubmit={handleSalary}>
+        <input name="salary" type="number" placeholder="Salary range" />
+        <input name="salary2" type="number" placeholder="Salary range" />
+        <input type="submit" value="search" />
+      </form>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
@@ -122,7 +141,7 @@ const UserTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {newUser
+            {data
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => (
                 <StyledTableRow key={row.id}>
